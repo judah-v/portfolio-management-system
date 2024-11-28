@@ -1,0 +1,59 @@
+Import necessary libraries
+Define constants and database connection configuration
+
+Class App:
+    Initialize connection and cursor
+    Initialize list of open pages
+    Create MainPage instance
+    Start Flask server in a separate thread
+    Define methods:
+        - get_data() to fetch data from database
+        - generate_qr_images() to generate QR codes for projects
+        - start_server() to start Flask server in a thread
+        - stop_server() to stop the Flask server
+        - run() to start the GUI event loop
+        - restart() to restart the application
+
+Class Page:
+    Initialize page with a Tkinter window
+    Attach close() method to window exit event
+    Define methods:
+        - next_field() for moving focus to next input field when user presses Enter
+        - close() to close current window (if called on main page, closes all windows)
+
+
+Class MainPage(child of Page):
+    Initialize main page with buttons for managing projects, editing info, and previewing page
+    Fetch and display project list
+    Define methods:
+        - get_projects() to fetch projects from database
+        - delete_project() to remove project from database and delete its image
+        - start_addinfo_page() to open AddInfoPage
+        - start_project_page() to open AddProjectPage
+
+Class AddInfoPage(child of Page):
+    Initialize page with fields for name and biography
+    Submit data to database and restart app
+    Define methods:
+        - submit_data() to validate user input and call save_data method
+        - save_data() to save project to database
+
+Class AddProjectPage(child of Page):
+    Initialize page with fields for project name, description, and link
+    Submit project data to database and restart app
+    Generate QR codes for new projects
+    Define methods:
+        - submit_data() to validate user input and call save_data method
+        - save_data() to save project to database
+
+
+Define Flask index route:
+    Execute SQL query to fetch author and project data
+    Generate image paths for projects with links
+    Render 'index.html' with author and project data
+
+if file is being run directly:
+    Connect to database using DB_CONFIG
+    Initialize App instance with the connection
+    Run the app (start GUI event loop)
+    Close database connection on app exit

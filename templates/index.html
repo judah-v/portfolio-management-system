@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sample Portfolio</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='index.css')}}">
+    <script src="{{url_for('static', filename='index.js')}}" defer></script>
+</head>
+<body>
+    <video autoplay loop muted id="myVideo">
+        <source src="{{url_for('static', filename='bg1.mp4')}}" type="video/mp4">
+      </video>
+    <h1>{{author.name}}</h1>
+    <p>{{author.bio}}</p>
+    {% if projects %}<h2>Projects</h2> {% endif %}
+    {% for project in projects %}
+    
+    <a href="{{project.link}}" target="_blank">
+        <div class="project-container">
+            {% if project.img %}<img src="{{url_for('static', filename=project.img)}}">{% endif %}
+            <h3>{{project.name}}</h3>
+            <p>{{project.desc}}</p>
+        </div>
+    </a>
+    {% endfor %}
+</body>
+</html>

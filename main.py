@@ -18,11 +18,12 @@ DB_CONFIG = {
 
 DEPLOY_PATH = os.path.dirname(os.path.abspath(__file__))
 
+flask_app = Flask(__name__)
 
 class App:
-    def __init__(self, conn):
-        self.conn = conn
-        self.dbc = conn.cursor(dictionary=True)
+    def __init__(self):
+        self.conn = mc.connect(**DB_CONFIG)
+        self.dbc = self.conn.cursor(dictionary=True)
         self.current_pages = []
         self.home = MainPage(self, 'Manage Portfolio', [500,500])
         self.start_server()
@@ -54,7 +55,7 @@ class App:
 
     def restart(self):
         self.home.close()
-        self.__init__(self.conn)
+        self.__init__()
 
 
 class Page:
@@ -132,7 +133,7 @@ class MainPage(Page):
             self.app.dbc.execute(f'select project_name as "name" from projects where project_id = {id}')
             link = self.app.dbc.fetchone()
             try:
-                os.remove(f'{DEPLOY_PATH}/images/{link['name']}.png') # delete any generated images
+                os.remove(f'{DEPLOY_PATH}/static/images/{link['name'].replace(' ', '_')}.png') # delete any generated images
             except FileNotFoundError:
                 pass
             self.app.dbc.execute(f'delete from projects where project_id = {id}')
@@ -248,11 +249,10 @@ class AddProjectPage(Page):
         self.app.generate_qr_images()
 
 
-flask_app = Flask(__name__)
 
 @flask_app.route('/')
 def index():
-    c = conn.cursor(dictionary=True)
+    c = app.conn.cursor(dictionary=True)
     c.execute('select author_name as "name", author_bio as bio from authors')
     author = c.fetchone()
     c.execute('select project_name as "name", project_desc as "desc", project_link as link from projects')
@@ -265,7 +265,6 @@ def index():
     return render_template(f'index.html', author=author, projects=projects)
 
 if __name__ == '__main__':
-    conn = mc.connect(**DB_CONFIG)
-    app = App(conn)
+    app = App()
     app.run()
-    conn.close()
+    app.conn.close()
